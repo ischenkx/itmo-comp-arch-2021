@@ -23,9 +23,9 @@ slt $s6, $s1, $s0
 
 ```
 addi $t0, $0, 32767
-lw $t0, 0($0)
-sw $t1, 0($0)
-sw $t2, 1($0)
+sw $t0, 0($0)
+lw $t1, 0($0)
+lw $t2, 4($0)
 ```
 
 ## [`branch.dat`](./branch.dat)
