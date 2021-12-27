@@ -108,7 +108,7 @@ if __name__ == '__main__':
         try:
             verilog_memory = verilog.run(instructions)
         except Exception as ex:
-            print('error occurred while running cpu tests:')
+            print('error occurred while running verilog tests:')
             print(ex)
             print('-' * 27)
             print('Input something to continue:')
