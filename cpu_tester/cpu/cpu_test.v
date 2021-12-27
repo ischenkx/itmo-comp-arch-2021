@@ -13,24 +13,15 @@ module cpu_test();
   end
 
   integer memory_iter;
-  integer end_counter;
-
   always @(negedge clk) begin
         if (instruction_memory_rd == 32'b0) begin
-          end_counter = 1;
-        end;
-
-        if (end_counter >= 1) begin
-            end_counter = end_counter + 1;
-            if (end_counter == 20) begin
-                $display("MEMORY_DUMP_BEGIN");
-              for (memory_iter = 0; memory_iter < $size(cpu_data_memory.mem); memory_iter = memory_iter + 1) begin
-                $display("%d %b", memory_iter, cpu_data_memory.mem[memory_iter]);
-              end
-              $display("MEMORY_DUMP_END");
-              $display("FINISH");
-              $finish();
-            end;
+            $display("MEMORY_DUMP_BEGIN");
+            for (memory_iter = 0; memory_iter < $size(cpu_data_memory.mem); memory_iter = memory_iter + 1) begin
+              $display("%d %b", memory_iter, cpu_data_memory.mem[memory_iter]);
+            end
+            $display("MEMORY_DUMP_END");
+            $display("FINISH");
+            $finish();
         end;
    end
 
