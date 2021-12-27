@@ -18,7 +18,7 @@ DEFAULT_CONFIG = {
     'iverilog_flags': '-g2012',
     'test_build_folder': 'test_build_folder',
     'registers_range': (1, 10),
-    'fails_folder': './fails'
+    'fails_folder': './fails',
 }
 
 
@@ -116,17 +116,14 @@ if __name__ == '__main__':
             continue
 
         for i in range(used_memory_cells):
-            # print(verilog_memory)
-            # print(cpu.memory)
-            # print('____')
             cpu_cell = cpu.read_mem(i)
             verilog_cell = verilog_memory[i]
             if cpu_cell != verilog_cell:
                 failed += 1
                 tag = save_failed_program(instructions, config['fails_folder'])
                 print(f'failure! tag={tag}')
-                print(verilog_memory)
-                print(cpu.memory)
+                print('verilog memory:', verilog_memory)
+                print('cpu memory:', cpu.memory)
                 break
         else:
             passed += 1
