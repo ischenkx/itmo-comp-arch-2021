@@ -7,4 +7,5 @@ cpu/util.v
 .idea
 fails
 test_build_folder
+instructions_tmp_folder
 __pycache__

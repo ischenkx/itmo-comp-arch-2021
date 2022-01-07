@@ -1,3 +1,6 @@
+import datetime
+import time
+
 from pycpu.mips.instructions import *
 
 
@@ -54,8 +57,15 @@ class MIPS(Processor):
     def branch(self, offset):
         self._branch_offset = offset
 
-    def run(self):
+    # time_out - milliseconds
+    def run(self, time_out=None):
+        start_time = datetime.datetime.now()
+
         while 0 <= self._pc < len(self.instructions):
+            if time_out is not None:
+                now = datetime.datetime.now()
+                if (now - start_time).total_seconds() >= time_out / 1000:
+                    raise TimeoutError('mips processor timeout...')
             self._current_instruction().execute(self)
             self._next_instruction()
 

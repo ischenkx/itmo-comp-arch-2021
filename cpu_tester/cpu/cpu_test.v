@@ -1,6 +1,7 @@
 `include "mips_cpu.v"
 `include "memory.v"
 `include "register_file.v"
+// `define SOURCE_FILE
 
 module cpu_test();
 
@@ -8,6 +9,7 @@ module cpu_test();
   wire [31:0] instruction_memory_a, instruction_memory_rd;
   initial begin
       clk = 0;
+      $readmemb(`SOURCE_FILE, cpu_instruction_memory.ram);
       forever
         #1 clk = ~clk;
   end
