@@ -144,7 +144,11 @@ class TestBench(object):
         return tag
 
     def run(self):
-        generator = ProgramGenerator(memory_cells=self._config.memory_cells)
+        generator = ProgramGenerator(memory_cells=self._config.memory_cells,
+                                     amount=self._config.max_instructions-1,
+                                     reg_range=self._config.registers_range
+                                )
+
         _input = queue.Queue()
         _output = queue.Queue()
 

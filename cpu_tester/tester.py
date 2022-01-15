@@ -13,6 +13,7 @@ if __name__ == '__main__':
         config_path = args[0]
 
     config = Config.from_file(config_path)
+
     test_bench = TestBench(config)
     test_bench.run()
 
