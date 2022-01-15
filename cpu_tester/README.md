@@ -14,14 +14,16 @@
 {
     "cpu_test_path": "./cpu/cpu_test.v",
     "cpu_folder": "./cpu",
-    "max_instructions": 200,
-    "instructions_file": "instructions.dat",
-    "tests": 10000,
+    "max_instructions": 1000,
+    "instructions_folder": "instructions_tmp_folder",
+    "tests": 100000,
     "memory_cells": 10,
     "iverilog_flags": "-g2012",
     "test_build_folder": "test_build_folder",
     "registers_range": [1, 10],
-    "fails_folder": "./fails"
+    "fails_folder": "./fails",
+    "workers": 50,
+    "time_out": 10000
 }
 ```
 'registers_range' - диапазон разрешенных регистров (регистры 0, 29, 30, 31 запрещено включать)
