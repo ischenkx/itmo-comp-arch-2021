@@ -69,9 +69,13 @@ class TestBench(object):
             verilog = VerilogApi(
                 test_path=self._config.cpu_test_path,
                 build_folder_path=self._config.test_build_folder,
-                iverilog_build_flags=f'{self._config.iverilog_flags} -I {self._config.cpu_folder}',
+                iverilog_build_flags=self._config.iverilog_flags,
+                cpu_files_folder=self._config.cpu_folder,
                 max_instructions=self._config.max_instructions,
-                instructions_folder_path=self._config.instructions_folder
+                instructions_folder_path=self._config.instructions_folder,
+                registers_array_name=self._config.registers_array_name,
+                memory_array_name=self._config.memory_array_name,
+                instructions_array_name=self._config.instructions_array_name
             )
 
             while True:
@@ -93,30 +97,52 @@ class TestBench(object):
                     continue
 
                 try:
-                    verilog_memory = verilog.run(job.get_instructions(), time_out=self._config.time_out)
+                    verilog_registers, verilog_memory = verilog.run(job.get_instructions(), time_out=self._config.time_out)
                 except Exception as ex:
                     res = TestBench.Result(job.get_id(), ok=False, message=f'unexpected error: {ex}', source='verilog')
                     self._output.put(res, block=False)
                     self._input.task_done()
                     continue
 
-                failed = False
+                mem_failed = False
                 for i in range(self._config.memory_cells):
                     cpu_cell = cpu.read_mem(i)
                     verilog_cell = verilog_memory[i]
                     if cpu_cell != verilog_cell:
-                        failed = True
+                        mem_failed = True
                         break
 
-                if failed:
+                if mem_failed:
                     res = TestBench.Result(job.get_id(),
                                            ok=False,
                                            message='memory check failed',
                                            source='cpu+verilog',
                                            memory_snapshots=(cpu.memory.copy(), verilog_memory.copy())
                                         )
-                else:
-                    res = TestBench.Result(job.get_id())
+                    self._output.put(res)
+                    self._input.task_done()
+                    continue
+
+                reg_failed = False
+                for i in range(self._config.registers_range[0], self._config.registers_range[1] + 1):
+                    cpu_cell = cpu.read_reg(i)
+                    verilog_cell = verilog_registers[i]
+                    if cpu_cell != verilog_cell:
+                        reg_failed = True
+                        break
+
+                if reg_failed:
+                    res = TestBench.Result(job.get_id(),
+                                           ok=False,
+                                           message='registers check failed',
+                                           source='cpu+verilog',
+                                           memory_snapshots=(cpu.registers.copy(), verilog_registers.copy())
+                                           )
+                    self._output.put(res)
+                    self._input.task_done()
+                    continue
+
+                res = TestBench.Result(job.get_id())
                 self._output.put(res)
                 self._input.task_done()
 

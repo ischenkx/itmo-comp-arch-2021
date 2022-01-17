@@ -14,6 +14,9 @@ DEFAULT_CONFIG = {
     'fails_folder': './fails',
     'workers': 4,
     'time_out': 5000,
+    'memory_array_name': None,
+    'registers_array_name': None,
+    'instructions_array_name': None,
 }
 
 
@@ -46,8 +49,11 @@ class Config(object):
                  registers_range,
                  fails_folder,
                  time_out,
-                 workers
-                 ):
+                 workers,
+                 memory_array_name,
+                 registers_array_name,
+                 instructions_array_name
+    ):
         self.cpu_test_path = cpu_test_path
         self.cpu_folder = cpu_folder
         self.max_instructions = max_instructions
@@ -60,4 +66,7 @@ class Config(object):
         self.fails_folder = fails_folder
         self.time_out = time_out
         self.workers = workers
+        self.memory_array_name = memory_array_name
+        self.registers_array_name = registers_array_name
+        self.instructions_array_name = instructions_array_name
 

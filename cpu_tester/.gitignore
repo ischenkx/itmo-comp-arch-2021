@@ -4,6 +4,7 @@ cpu/control_unit.v
 cpu/memory.v
 cpu/register_file.v
 cpu/util.v
+local_tester.py
 .idea
 fails
 test_build_folder

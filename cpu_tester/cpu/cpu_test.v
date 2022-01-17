@@ -1,7 +1,6 @@
 `include "mips_cpu.v"
 `include "memory.v"
 `include "register_file.v"
-// `define SOURCE_FILE
 
 module cpu_test();
 
@@ -9,19 +8,24 @@ module cpu_test();
   wire [31:0] instruction_memory_a, instruction_memory_rd;
   initial begin
       clk = 0;
-      $readmemb(`SOURCE_FILE, cpu_instruction_memory.ram);
+      $readmemb(`SOURCE_FILE, cpu_instruction_memory.`INSTR_ARR);
       forever
         #1 clk = ~clk;
   end
 
-  integer memory_iter;
+  integer _iter;
   always @(negedge clk) begin
         if (instruction_memory_rd == 32'b0) begin
             $display("MEMORY_DUMP_BEGIN");
-            for (memory_iter = 0; memory_iter < $size(cpu_data_memory.mem); memory_iter = memory_iter + 1) begin
-              $display("%d %b", memory_iter, cpu_data_memory.mem[memory_iter]);
+            for (_iter = 0; _iter < $size(cpu_data_memory.`MEM_ARR); _iter = _iter + 1) begin
+              $display("%d %b", _iter, cpu_data_memory.`MEM_ARR[_iter]);
             end
             $display("MEMORY_DUMP_END");
+            $display("REG_DUMP_BEGIN");
+            for (_iter = 0; _iter < $size(cpu_register.`REG_ARR); _iter = _iter + 1) begin
+              $display("%d %b", _iter, cpu_register.`REG_ARR[_iter]);
+            end
+            $display("REG_DUMP_END");
             $display("FINISH");
             $finish();
         end;
