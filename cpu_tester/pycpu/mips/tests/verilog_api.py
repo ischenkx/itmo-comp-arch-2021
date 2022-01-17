@@ -86,6 +86,62 @@ class VerilogApi(object):
             ast = codeparser.parse()
             return self._parse_modules(ast)
 
+    @staticmethod
+    def deduce_array_names(cpu_files_folder,
+                           registers_array_name,
+                           memory_array_name,
+                           instructions_array_name
+                           ):
+        def find_multidimensional_vars(vars):
+            return list(map(lambda x: x['name'], filter(lambda x: x['dimensions'] is not None, vars)))
+
+        def deduce_name(cur_val, modules, mod_name, default_name):
+            if cur_val is not None:
+                return cur_val
+
+            deduced_name = default_name
+
+            if mod_name in modules:
+                candidates = find_multidimensional_vars(modules[mod_name])
+                if len(candidates) > 0:
+                    if len(candidates) > 1:
+                        print(
+                            f'[ERROR] failed to deduce the name of the \'{mod_name}\' array! too many candidates: {candidates}'
+                        )
+
+                    else:
+                        deduced_name = candidates[0]
+            print(f'[LOG] deduced \'{mod_name}\' array name: {deduced_name}')
+            return deduced_name
+
+        memory_module_path = os.path.join(cpu_files_folder, 'memory.v')
+        registers_module_path = os.path.join(cpu_files_folder, 'register_file.v')
+        mem_modules = VerilogApi.ModuleParser(memory_module_path).parse()
+        reg_modules = VerilogApi.ModuleParser(registers_module_path).parse()
+
+        registers_array_name = deduce_name(
+            registers_array_name,
+            reg_modules,
+            'register_file',
+            'registers'
+        )
+
+        memory_array_name = deduce_name(
+            memory_array_name,
+            mem_modules,
+            'data_memory',
+            'mem'
+        )
+
+        instructions_array_name = deduce_name(
+            instructions_array_name,
+            mem_modules,
+            'instruction_memory',
+            'ram'
+        )
+
+        return registers_array_name, memory_array_name, instructions_array_name
+
     def __init__(self,
                  test_path,
                  build_folder_path,
@@ -113,55 +169,6 @@ class VerilogApi(object):
         self._init_instructions_folder()
         self._compile_tests()
 
-    def _deduce_array_names(self):
-        def find_multidimensional_vars(vars):
-            return list(map(lambda x: x['name'], filter(lambda x: x['dimensions'] is not None, vars)))
-
-        def deduce_name(cur_val, modules, mod_name, default_name):
-            if cur_val is not None:
-                return cur_val
-
-            deduced_name = default_name
-
-            if mod_name in modules:
-                candidates = find_multidimensional_vars(modules[mod_name])
-                if len(candidates) > 0:
-                    if len(candidates) > 1:
-                        print(
-                            f'[ERROR] failed to deduce the name of the \'{mod_name}\' array! too many candidates: {candidates}'
-                        )
-
-                    else:
-                        deduced_name = candidates[0]
-            print(f'[LOG] deduced \'{mod_name}\' array name: {deduced_name}')
-            return deduced_name
-
-        memory_module_path = os.path.join(self._cpu_files_folder, 'memory.v')
-        registers_module_path = os.path.join(self._cpu_files_folder, 'register_file.v')
-        mem_modules = VerilogApi.ModuleParser(memory_module_path).parse()
-        reg_modules = VerilogApi.ModuleParser(registers_module_path).parse()
-
-        self._registers_array_name = deduce_name(
-            self._registers_array_name,
-            reg_modules,
-            'register_file',
-            'registers'
-        )
-
-        self._memory_array_name = deduce_name(
-            self._memory_array_name,
-            mem_modules,
-            'data_memory',
-            'mem'
-        )
-
-        self._instructions_array_name = deduce_name(
-            self._instructions_array_name,
-            mem_modules,
-            'instruction_memory',
-            'ram'
-        )
-
     def _get_instructions_file_path(self):
         return os.path.join(self._get_instructions_folder_path(), self._instructions_file_name)
 
@@ -183,7 +190,6 @@ class VerilogApi(object):
             os.mkdir(self._get_build_folder_path())
 
     def _compile_tests(self):
-        self._deduce_array_names()
         subprocess.check_output(
             f'iverilog -o {self._get_build_file_path()} {self._iverilog_build_flags} -I {self._cpu_files_folder} -DMEM_ARR="{self._memory_array_name}" -DREG_ARR="{self._registers_array_name}" -DINSTR_ARR="{self._instructions_array_name}" -DSOURCE_FILE="\\"{self._instructions_folder_path}/{self._instructions_file_name}\\"" {self.test_path}'
         )
@@ -238,5 +244,5 @@ class VerilogApi(object):
             time_out = 2 ** 42
         self._write_instructions(instructions)
         command = f'vvp {self._get_build_file_path()}'
-        output = subprocess.check_output(command, timeout=time_out/1000)
+        output = subprocess.check_output(command, timeout=time_out / 1000)
         return self._decode_tests_output(output)

@@ -10,7 +10,6 @@ from pycpu.mips.tests.verilog_api import VerilogApi
 
 
 class TestBench(object):
-
     class Job(object):
         def __init__(self, instructions, id):
             self.instructions = instructions
@@ -97,7 +96,8 @@ class TestBench(object):
                     continue
 
                 try:
-                    verilog_registers, verilog_memory = verilog.run(job.get_instructions(), time_out=self._config.time_out)
+                    verilog_registers, verilog_memory = verilog.run(job.get_instructions(),
+                                                                    time_out=self._config.time_out)
                 except Exception as ex:
                     res = TestBench.Result(job.get_id(), ok=False, message=f'unexpected error: {ex}', source='verilog')
                     self._output.put(res, block=False)
@@ -118,7 +118,7 @@ class TestBench(object):
                                            message='memory check failed',
                                            source='cpu+verilog',
                                            memory_snapshots=(cpu.memory.copy(), verilog_memory.copy())
-                                        )
+                                           )
                     self._output.put(res)
                     self._input.task_done()
                     continue
@@ -170,10 +170,27 @@ class TestBench(object):
         return tag
 
     def run(self):
+        if self._config.instructions_array_name is None or \
+                self._config.memory_array_name is None or \
+                self._config.registers_array_name is None:
+            registers_array_name, memory_array_name, instructions_array_name = VerilogApi.deduce_array_names(
+                self._config.cpu_folder,
+                self._config.registers_array_name,
+                self._config.memory_array_name,
+                self._config.instructions_array_name
+            )
+
+            if self._config.registers_array_name is None:
+                self._config.registers_array_name = registers_array_name
+            if self._config.memory_array_name is None:
+                self._config.memory_array_name = memory_array_name
+            if self._config.instructions_array_name is None:
+                self._config.instructions_array_name = instructions_array_name
+
         generator = ProgramGenerator(memory_cells=self._config.memory_cells,
-                                     amount=self._config.max_instructions-1,
+                                     amount=self._config.max_instructions - 1,
                                      reg_range=self._config.registers_range
-                                )
+                                     )
 
         _input = queue.Queue()
         _output = queue.Queue()
@@ -232,4 +249,3 @@ class TestBench(object):
 
         for w in workers:
             w.kill()
-
