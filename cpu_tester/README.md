@@ -1,15 +1,22 @@
-Генерирует рандомные тесты -> запускает их внутри себя -> запускает в верилоге -> сравнивает снэпшоты памяти.
+# Overview
+- Generates random tests
+- Runs them in a python emulator
+- Runs them in a verilog cpu
+- Compares memory snapshots
 
-Для начала потребуются: готовый проц, python (+numpy), icarus verilog (iverilog, vvp должны быть в PATH).
+# Requirements
+- Python
+- Numpy
+- Icarus Verilog (iverilog, vvp must be in the PATH)
 
-Запуск:
-1. Скопировать все файлы из этой папки
-2. В <SOURCE\_DIR (default=cpu)> положить файлы своего процессора (+ cpu_test.v из папки cpu)
-3. Если не хотите использовать дефолтные значения - надо написать конфиг файл (json)
-4. Запустить tester.py: python tester.py [CONFIG_PATH]
-5. Если у вас будет что-то неправильно (с точки зрения тестера конечно же :)), вам выдастся сообщение об ошибке, и программа, неправильно отработавшая, будет записана в <FAILS\_FOLDER> в файлы <TAG>\_asm и <TAG>\_bin. (сайт, где можно запустить ассемблер - http://www.csbio.unc.edu/mcmillan/miniMIPS.html)
+# How to run?
+1. Clone this repo
+2. Put your cpu files in the <SOURCE\_DIR (default=cpu)> (don't touch cpu_test.v)
+3. (Optional) modify the config file
+4. python tester.py <CONFIG_PATH (default="config.json")>
 
-Конфиг:
+
+# Config
 ```json
 {
     "cpu_test_path": "./cpu/cpu_test.v",
@@ -29,6 +36,3 @@
     "instructions_array_name": null
 }
 ```
-'registers_range' - диапазон разрешенных регистров (регистры 0, 29, 30, 31 запрещено включать)
-
-WARNING: 'memory_cells' должно быть равно объему памяти, а 'max_instructions' меньше максимального кол-ва инструкций.
