@@ -36,3 +36,6 @@
     "instructions_array_name": null
 }
 ```
+
+
+An example of a working cpu can be found in the 'cpu' folder.
