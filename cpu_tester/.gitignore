@@ -1,9 +1,9 @@
-cpu/mips_cpu.v
-cpu/alu.v
-cpu/control_unit.v
-cpu/memory.v
-cpu/register_file.v
-cpu/util.v
+#cpu/mips_cpu.v
+#cpu/alu.v
+#cpu/control_unit.v
+#cpu/memory.v
+#cpu/register_file.v
+#cpu/util.v
 local_tester.py
 parser.out
 parsetab.py
